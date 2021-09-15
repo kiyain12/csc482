@@ -26,6 +26,7 @@ func main() {
 
 	resp, err := http.Get("https://www.metaweather.com/api/location/2459115/2021/9/13/")
 	if err != nil {
+		client.Send("error", "This is an error message")
 		log.Fatal(err)
 	}
 
@@ -34,6 +35,7 @@ func main() {
 	body, err := ioutil.ReadAll(resp.Body)
 
 	if err != nil {
+		client.Send("error", "This is an error message")
 		log.Fatal(err)
 	}
 
@@ -41,10 +43,18 @@ func main() {
 	err = json.Unmarshal(body, &x)
 
 	if err != nil {
+		client.Send("error", "This is an error message")
 		log.Fatal(err)
 	}
 
 	log.Printf("%+v", x)
+
+	output := strconv.Itoa(int(len(x)))
+	// output2 := resp.Body
+
+	// Valid Send (no error returned)
+	err = client.EchoSend("info", "Success! Data size: "+output)
+	fmt.Println("err:", err)
 
 	// _, err = os.Stdout.Write(body)
 
@@ -61,11 +71,5 @@ func main() {
 	// fmt.Println("successfully opened json file")
 
 	// defer jsonFile.Close()
-
-	output := strconv.Itoa(int(len(x)))
-
-	// Valid Send (no error returned)
-	err = client.EchoSend("info", "Success! Data size: " + output)
-	fmt.Println("err:", err)
 
 }
