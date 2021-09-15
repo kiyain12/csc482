@@ -49,7 +49,7 @@ func main() {
 
 	log.Printf("%+v", x)
 
-	output := strconv.Itoa(int(len(x)))
+	output := strconv.Itoa(int(len(body)))
 	// output2 := resp.Body
 
 	// Valid Send (no error returned)
