@@ -1,12 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	loggly "github.com/jamespearly/loggly"
-	"fmt"
 )
 
 func main() {
@@ -39,23 +39,14 @@ func main() {
 
 	// defer jsonFile.Close()
 
-	var tag string = "My-Go-Demo"
-	
-
-	// client := loggly.New(tag)
+	var tag string = "NathanAnishaOREdima"
 
 	// log.Print("This is our first log message in Go.")
 
 	client := loggly.New(tag)
 
-		// Valid Send (no error returned)
-		err = client.Send("error", "Good morning! No echo.")
-		fmt.Println("err:", err)
-
-		
-		// Invalid EchoSend -- message level error
-		err = client.EchoSend("blah", "blah")
-		fmt.Println("err:", err)
-
+	// Valid Send (no error returned)
+	err = client.EchoSend("error", "Good morning! No echo.")
+	fmt.Println("err:", err)
 
 }
