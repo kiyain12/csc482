@@ -1,4 +1,4 @@
-module hello
+module csc482
 
 go 1.17
 

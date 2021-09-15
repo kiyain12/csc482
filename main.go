@@ -2,15 +2,19 @@ package main
 
 import (
 	"fmt"
+	loggly "github.com/jamespearly/loggly"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
-
-	loggly "github.com/jamespearly/loggly"
 )
 
 func main() {
+
+	var tag string = "firstapplication"
+
+	client := loggly.New(tag)
+
 	resp, err := http.Get("https://www.metaweather.com/api/location/2459115/2021/9/13/")
 	if err != nil {
 		log.Fatal(err)
@@ -40,14 +44,8 @@ func main() {
 
 	// defer jsonFile.Close()
 
-	var tag string = "firstapplication"
-
-	// log.Print("This is our first log message in Go.")
-
-	client := loggly.New(tag)
-
 	// Valid Send (no error returned)
-	err = client.EchoSend("error", "Good morning! No echo.")
+	err = client.Send("info", body)
 	fmt.Println("err:", err)
 
 }
