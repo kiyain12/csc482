@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+
 	loggly "github.com/jamespearly/loggly"
 )
 
@@ -39,7 +40,7 @@ func main() {
 
 	// defer jsonFile.Close()
 
-	var tag string = "NathanAnishaOREdima"
+	var tag string = "firstapplication"
 
 	// log.Print("This is our first log message in Go.")
 
