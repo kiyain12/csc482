@@ -1,13 +1,22 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
-	loggly "github.com/jamespearly/loggly"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
+	"strconv"
+
+	loggly "github.com/jamespearly/loggly"
 )
+
+type weatherData struct {
+	ID            int     `json:"id"`
+	DATE          string  `json:"applicable_date"`
+	TEMPERATURE   float64 `json:"the_temp`
+	WEATHERSTATUS string  `json:"weather_state_name"`
+}
 
 func main() {
 
@@ -28,11 +37,20 @@ func main() {
 		log.Fatal(err)
 	}
 
-	_, err = os.Stdout.Write(body)
+	var x []weatherData
+	err = json.Unmarshal(body, &x)
 
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	log.Printf("%+v", x)
+
+	// _, err = os.Stdout.Write(body)
+
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	// jsonFile, err := os.Open(resp.Status)
 
@@ -44,8 +62,10 @@ func main() {
 
 	// defer jsonFile.Close()
 
+	output := strconv.Itoa(int(len(x)))
+
 	// Valid Send (no error returned)
-	err = client.Send("info", body)
+	err = client.EchoSend("info", "Success! Data size: " + output)
 	fmt.Println("err:", err)
 
 }
