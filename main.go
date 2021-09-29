@@ -13,6 +13,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	loggly "github.com/jamespearly/loggly"
 )
@@ -25,43 +26,76 @@ type weatherData struct {
 }
 
 func main() {
+	//https://qvault.io/golang/range-over-ticker-in-go-with-immediate-first-tick/
+	ticker := time.NewTicker(time.Minute)
+	t := time.Now()
 
-	var tag string = "firstapplication"
+	for ; true; <-ticker.C {
 
-	client := loggly.New(tag)
+		// currentTime := time.Now()
 
-	resp, err := http.Get("https://www.metaweather.com/api/location/2459115/2021/9/13/")
-	if err != nil {
-		client.Send("error", "This is an error message:"+err.Error())
-		log.Fatal(err)
+		var tag string = "firstapplication"
+
+		client := loggly.New(tag)
+
+		// resp, err := http.Get("https://www.metaweather.com/api/location/2459115/2021/9/13/")
+
+		// resp, err := http.NewRequest("GET", "https://www.metaweather.com/api/location/2459115", nil)
+
+		// year := strconv.Itoa(t.Year())
+		month := strconv.Itoa(int(t.Month()))
+		day := strconv.Itoa(t.Day())
+
+		// params := "year" + url.QueryEscape(year) + "/" +
+		// 	"month" + url.QueryEscape(month) + "/" +
+		// 	"day" + url.QueryEscape(day) + "/"
+
+		//use the Sprintf() function to format the string without printing and then store it to another variable
+		path := fmt.Sprintf("https://www.metaweather.com/api/location/2459115/2021/" + month + "/" + day)
+		// resp, err := http.Get(path)
+
+		// params := ("2006/01/02")
+
+		// path := fmt.Sprintf("https://www.metaweather.com/api/location/2459115/", params)
+
+		resp, err := http.Get(path)
+
+		// resp, err := http.Get("https://www.metaweather.com/api/location/2459115/" + currentTime.Format("2021/01/02"))
+
+		if err != nil {
+			client.Send("error", "This is an error message:"+err.Error())
+			log.Fatal(err)
+		}
+
+		defer resp.Body.Close()
+
+		body, err := ioutil.ReadAll(resp.Body)
+
+		if err != nil {
+			client.Send("error", "This is an error message:"+err.Error())
+			log.Fatal(err)
+		}
+
+		var x []weatherData
+		err = json.Unmarshal(body, &x)
+
+		if err != nil {
+			client.Send("error", "This is an error message:"+err.Error())
+			log.Fatal(err)
+		}
+
+		log.Printf("%+v", x)
+
+		output := strconv.Itoa(int(len(body)))
+		//  output2 := resp.ContentLength
+
+		// Valid Send (no error returned)
+		err = client.EchoSend("info", "Success! Data size: "+output)
+		fmt.Println("err:", err)
+
+		// q := resp.URL.Query()
+
 	}
-
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-
-	if err != nil {
-		client.Send("error", "This is an error message:"+err.Error())
-		log.Fatal(err)
-	}
-
-	var x []weatherData
-	err = json.Unmarshal(body, &x)
-
-	if err != nil {
-		client.Send("error", "This is an error message:"+err.Error())
-		log.Fatal(err)
-	}
-
-	log.Printf("%+v", x)
-
-	output := strconv.Itoa(int(len(body)))
-	//  output2 := resp.ContentLength
-
-	// Valid Send (no error returned)
-	err = client.EchoSend("info", "Success! Data size: "+output)
-	fmt.Println("err:", err)
-
 	// _, err = os.Stdout.Write(body)
 
 	// if err != nil {
