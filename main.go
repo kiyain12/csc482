@@ -11,10 +11,16 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	loggly "github.com/jamespearly/loggly"
 )
 
@@ -25,13 +31,37 @@ type weatherData struct {
 	WEATHERSTATUS string  `json:"weather_state_name"`
 }
 
+type dbitem struct {
+	Id   string
+	Time string
+	Data []weatherData
+}
+
+// AWS.config.update({
+// 	endpoint: "https://dynamodb.us-east-1.amazonaws.com"}
+//  );
+
+func RandomString(n int) string {
+	var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+
+	s := make([]rune, n)
+	for i := range s {
+		s[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(s)
+}
+
 func main() {
+
+	os.Setenv("AWS_ACCESS_KEY_ID", "ASIA23TDYOD3M62KSLYN")
+	os.Setenv("AWS_SECRET_ACCESS_KEY", "AVS3NkzlGO78VZTAs8MjvDEpxf78MAMnz2Kr2xJ5")
+	os.Setenv("AWS_SESSION_TOKEN", "FwoGZXIvYXdzEDoaDCF/z/3JPwV5m7uf8SLBAbgvY6v+5uaY6NrnLiqbSR5Oh9m2g+4TcbzrPtbOE9Vqn90WmG8fW5+oXogoVJNbjtyBs6S3Wwx9kGa3clsySp81d4d/6eaS5aAB/xcOwciTxrADJahN4VJzhKTZhdMMev4K4+U0AVPcGaHgLGJ7gNwhLfogv6Jl/Nd+J+KDhvDDHkpJL7NAN5DhwUeNl1lMkaqGO+oxaI2Apdce03bkGJ3v2DkMrLOA6J4hR70M+VRWpyxpB2rctTJLzqfCrwaT9GAoxp+4iwYyLVDNqQ7k2Wil8lkH/FmpVxCr43KxUqg5H/ehEsX8h0+C/HMobsJpg40725loBA==")
+
 	//https://qvault.io/golang/range-over-ticker-in-go-with-immediate-first-tick/
 	ticker := time.NewTicker(time.Minute)
 	t := time.Now()
 
 	for ; true; <-ticker.C {
-
 		// currentTime := time.Now()
 
 		var tag string = "firstapplication"
@@ -93,23 +123,42 @@ func main() {
 		err = client.EchoSend("info", "Success! Data size: "+output)
 		fmt.Println("err:", err)
 
-		// q := resp.URL.Query()
+		//################################################ DYNAMO DB STARTS BELOW ########################################################################################
+		sess, err := session.NewSession(&aws.Config{
+			Region: aws.String("us-east-1")},
+		)
+		if err != nil {
+			fmt.Println("Error starting a new session")
+		}
+		// Create DynamoDB client
+		svc := dynamodb.New(sess)
+
+		var dbitem dbitem
+		dbitem.Data = x
+		dbitem.Time = time.Now().String()
+		dbitem.Id = RandomString(10)
+
+		//set the id, time, weatherdb -> the pass the item to marshal tingy
+
+		av, err := dynamodbattribute.MarshalMap(dbitem)
+		if err != nil {
+			log.Fatalf("Got error marshalling new weather item: %s", err)
+		}
+
+		tableName := "csc_482"
+
+		input := &dynamodb.PutItemInput{
+			Item:      av,
+			TableName: aws.String(tableName),
+		}
+
+		_, err = svc.PutItem(input)
+		if err != nil {
+			log.Fatalf("Got error calling PutItem: %s", err)
+		}
+
+		fmt.Println("Successfully added '" + dbitem.Id + "' to table " + tableName)
 
 	}
-	// _, err = os.Stdout.Write(body)
-
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// jsonFile, err := os.Open(resp.Status)
-
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
-
-	// fmt.Println("successfully opened json file")
-
-	// defer jsonFile.Close()
 
 }
