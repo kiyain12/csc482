@@ -13,7 +13,6 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
-	"os"
 	"strconv"
 	"time"
 
@@ -53,9 +52,9 @@ func RandomString(n int) string {
 
 func main() {
 
-	os.Setenv("AWS_ACCESS_KEY_ID", "ASIA23TDYOD3M62KSLYN")
-	os.Setenv("AWS_SECRET_ACCESS_KEY", "AVS3NkzlGO78VZTAs8MjvDEpxf78MAMnz2Kr2xJ5")
-	os.Setenv("AWS_SESSION_TOKEN", "FwoGZXIvYXdzEDoaDCF/z/3JPwV5m7uf8SLBAbgvY6v+5uaY6NrnLiqbSR5Oh9m2g+4TcbzrPtbOE9Vqn90WmG8fW5+oXogoVJNbjtyBs6S3Wwx9kGa3clsySp81d4d/6eaS5aAB/xcOwciTxrADJahN4VJzhKTZhdMMev4K4+U0AVPcGaHgLGJ7gNwhLfogv6Jl/Nd+J+KDhvDDHkpJL7NAN5DhwUeNl1lMkaqGO+oxaI2Apdce03bkGJ3v2DkMrLOA6J4hR70M+VRWpyxpB2rctTJLzqfCrwaT9GAoxp+4iwYyLVDNqQ7k2Wil8lkH/FmpVxCr43KxUqg5H/ehEsX8h0+C/HMobsJpg40725loBA==")
+	// os.Setenv("AWS_ACCESS_KEY_ID", "")
+	// os.Setenv("AWS_SECRET_ACCESS_KEY", "")
+	// os.Setenv("AWS_SESSION_TOKEN", "")
 
 	//https://qvault.io/golang/range-over-ticker-in-go-with-immediate-first-tick/
 	ticker := time.NewTicker(time.Minute)
