@@ -26,8 +26,9 @@ import (
 type weatherData struct {
 	ID            int     `json:"id"`
 	DATE          string  `json:"applicable_date"`
-	TEMPERATURE   float64 `json:"the_temp`
+	TEMPERATURE   float64 `json:"the_temp"`
 	WEATHERSTATUS string  `json:"weather_state_name"`
+	TIMESTAMP     string  `json:"created"`
 }
 
 type dbitem struct {
@@ -57,10 +58,10 @@ func main() {
 	// os.Setenv("AWS_SESSION_TOKEN", "")
 
 	//https://qvault.io/golang/range-over-ticker-in-go-with-immediate-first-tick/
-	ticker := time.NewTicker(time.Minute)
-	t := time.Now()
+	ticker := time.NewTicker(time.Hour * 3)
 
 	for ; true; <-ticker.C {
+		t := time.Now()
 		// currentTime := time.Now()
 
 		var tag string = "firstapplication"
@@ -144,7 +145,7 @@ func main() {
 			log.Fatalf("Got error marshalling new weather item: %s", err)
 		}
 
-		tableName := "csc_482"
+		tableName := "npayag-weather-table-csc-482"
 
 		input := &dynamodb.PutItemInput{
 			Item:      av,
